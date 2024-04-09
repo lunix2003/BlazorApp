@@ -1,0 +1,23 @@
+﻿<div class="alert @AlertType" role="alert">
+    Hello world.....! alert component
+    <h3>@Title</h3>
+</div>
+
+<button @onclick="ClickMe" class="@btnStyle">Click Me @number</button>
+
+
+@code {
+    [Parameter]
+    public string? Title { get; set; } = "Hello";
+    [Parameter]
+    public string? AlertType { get; set; } = "alert-success";
+    [Parameter]
+    public string? btnStyle { get; set; } = "btn btn-success";
+
+    int number = 1;
+    private void ClickMe()
+    {
+        ++number;
+        AlertType = "alert-primary";
+    }
+}

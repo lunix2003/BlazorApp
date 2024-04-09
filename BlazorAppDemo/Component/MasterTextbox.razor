@@ -1,0 +1,18 @@
+﻿<div class="mb-2">
+    <label></label>
+    <input type="text" class="form-control" 
+    @attributes="@AdditionalAttribute"
+    @bind="@test" />
+</div>
+<button class="btn btn-success" @onclick="ClickMe">Click</button>
+@code{
+    [Parameter] public string? Text {get;set;}
+    [Parameter] public string? Caption {get;set;}
+    [Parameter] public string? test {get;set;}
+    [Parameter(CaptureUnmatchedValues=true)] public Dictionary<string,object> AdditionalAttribute{get; set;}
+    [Parameter] public EventCallback<string> Click {get;set;}
+    async Task ClickMe(){
+        await Click.InvokeAsync(Caption);
+        Console.WriteLine(test);
+    }
+}

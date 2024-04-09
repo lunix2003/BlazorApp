@@ -1,0 +1,28 @@
+﻿@page "/weeklyforecast"
+@using static BlazorAppDemo.Pages.Weather
+@inject WeatherForecastService forecastService
+
+<h3>WeeklyForeCast</h3>
+<div class="d-flex">
+    @foreach(var item in Enumerable.Range(1, 5))
+    {
+        <WeatherDay
+            Summary="Cloudy"
+            TemperatureC="20"
+            DayOfWeek="DayOfWeek.Friday"
+            >
+        </WeatherDay>
+    }
+</div>
+
+@code {
+   
+
+    private static readonly string[] Summaries = new[]
+        {
+        "Cloudy","Rainy","Sunny"
+    };
+
+    
+
+}

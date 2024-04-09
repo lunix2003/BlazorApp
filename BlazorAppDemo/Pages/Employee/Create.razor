@@ -1,0 +1,122 @@
+﻿@using BlazorAppDemo.Halper
+<h2>Create Employee</h2>
+<EditForm Model="emp" OnValidSubmit="CreateorEdit">
+    <DataAnnotationsValidator />
+    <input type="hidden" @bind="emp.Id" />
+    <div class="mb-2">
+        <label for="FirstName">First Name</label>
+        <div>
+            <InputText @bind-Value="emp.FirstName" class="form-control" />
+            <ValidationMessage For="@(()=> emp.FirstName)" />
+        </div>
+    </div>
+    <div class="mb-2">
+        <label for="LastName">Last Name</label>
+        <div>
+            <InputText @bind-Value="emp.LastName" class="form-control" />
+            <ValidationMessage For="@(()=> emp.LastName)" />
+        </div>
+    </div>
+    <div class="mb-2">
+        <label for="JobTitle">Job Title</label>
+        <div>
+            <InputText @bind-Value="emp.JobTitle" class="form-control">
+
+            </InputText>
+            <ValidationMessage For="@(()=> emp.JobTitle)" />
+        </div>
+    </div>
+    <div class="mb-2">
+        <label for="Gender">Gender</label>
+        <div>
+            <InputText @bind-Value="emp.Gender" class="form-control">
+                 
+            </InputText>
+            <ValidationMessage For="@(()=> emp.Gender)" />
+        </div>
+    </div>
+    <button class="btn btn-success" type="submit">Save</button>
+</EditForm>
+@(employees.Any()){
+<table class="table table-sm table-hover">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Job Title</th>
+            <th>Gender</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in employees)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.FirstName</td>
+                <td>@item.LastName</td>
+                <td>@item.JobTitle</td>
+                <td>@item.Gender</td>
+                <td>
+                    <button @onclick="@(() => EditEmployee(item.Id))" class="btn btn-info">Edit</button>
+                    <button @onclick="@(() => DeleteEmployee(item.Id))" class="btn btn-danger">Delete</button>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+}
+
+@code {
+    private int empId = 0;
+    private Employee emp = new();
+    private IEnumerable<Employee> employees = [];
+    [Inject]
+    private HttpClient http { get; set; } = default!;
+    [Inject]
+    IEmployeeService employeeService { get; set; } = default!;
+    [Inject]
+    SweetAlertService Swal { get; set; } = default!;
+   
+    protected override async Task OnInitializedAsync()
+    {
+        await GetEmployee();
+        await base.OnInitializedAsync();
+    }
+
+
+    async Task CreateorEdit()
+    {
+        if (empId <= 0)
+        {
+            await employeeService.CreateEmployee(emp);
+        }
+        else
+        {
+            await employeeService.UpdateEmployee(emp,empId);
+        }
+        await GetEmployee ();
+    }
+    async Task EditEmployee(int id)
+    {
+        emp = await employeeService.EditEmployee(id);
+        if (emp != null)
+        {
+            empId = emp.Id;
+        }
+    }
+    async Task DeleteEmployee(int id)
+    {
+        var res = await http!.DeleteAsync($"https://localhost:7290/api/Employee/{id}");
+        if (res.IsSuccessStatusCode)
+        {
+            await GetEmployee();
+        }
+    }
+    async Task GetEmployee()
+    {
+        employees = await employeeService.GetEmployees();
+    }
+}

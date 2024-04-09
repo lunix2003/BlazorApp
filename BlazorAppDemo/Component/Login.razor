@@ -1,0 +1,53 @@
+﻿@using Radzen.Blazor.Rendering
+<h3>Login</h3>
+
+<div Class="rz-p-0 rz-p-md-12">
+    <RadzenRow Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap" Gap="1rem" Class="rz-p-sm-12">
+        <RadzenFormField Text="Account" Variant="@variant">
+            <Start>
+                <RadzenIcon Icon="account_circle" />
+            </Start>
+            <ChildContent>
+                <RadzenTextBox @bind-Value="@value" @Attributes="@AdditionalAttribute" />
+            </ChildContent>
+            
+        </RadzenFormField>
+        <RadzenFormField Text="Password" Variant="@variant">
+            <ChildContent>
+                <RadzenTextBox @bind-Value="@passwordValue" Visible="@(!password)" @Attributes="@AdditionalAttribute" />
+                <RadzenPassword @bind-Value="@passwordValue" Visible="@password" @Attributes="@AdditionalAttribute" />
+            </ChildContent>
+            <End>
+                <RadzenButton Icon="@(password ? "visibility" : "visibility_off")" Click="TogglePassword" Variant="Variant.Text" Size="ButtonSize.Small" />
+            </End>
+        </RadzenFormField>
+        <RadzenButton Text="Login" Click="AddData">
+
+        </RadzenButton>
+    </RadzenStack>
+    </RadzenRow>
+</div>
+
+@code {
+    string value = "Salun";
+    string passwordValue = "password";
+    bool password = true;
+    Variant variant = Variant.Outlined;
+
+    void TogglePassword()
+    {
+        password = !password;
+    }
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> AdditionalAttribute { get; set; }
+    [Parameter]
+    public EventCallback Click { get; set; }
+
+    async Task AddData()
+    {
+        await Click.InvokeAsync();
+        Console.WriteLine(value);
+        Console.WriteLine(passwordValue);
+    }
+}

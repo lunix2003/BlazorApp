@@ -1,0 +1,29 @@
+﻿@page "/employees"
+@using BlazorAppDemo.Halper
+
+
+@* <div>
+    <QuickGrid Items="@Employees" Pagination="page">
+        <PropertyColumn Property="@(emp=>emp.Id)" Sortable="true" InitialSortDirection="SortDirection.Ascending" />
+        <PropertyColumn Property="@(emp=>emp.FirstName)" Sortable="true" />
+        <PropertyColumn Property="@(emp=>emp.LastName)" Sortable="true" />
+        <PropertyColumn Property="@(emp=>emp.Gender)" Sortable="true" />
+        <PropertyColumn Property="@(emp=>emp.JobTitle)" Sortable="true" />
+    </QuickGrid>
+</div>
+ *@
+@code {
+    private IQueryable<Employee>? Employees;
+    [Inject]
+    IEmployeeService employeeService { get; set; } = default!;
+    //page
+    //private PaginationState page = new PaginationState { ItemsPerPage = 4 };
+    protected override async Task OnInitializedAsync()
+    {
+        var employees = await employeeService.GetEmployees();
+
+        Employees = employees.AsQueryable();
+
+        await base.OnInitializedAsync();
+    }
+}

@@ -1,0 +1,22 @@
+@inject IJSRuntime js
+@page "/js"
+@using BlazorAppDemo.Data
+
+<h1>Hello , World</h1>
+@if (hasGeolocation)
+{
+    <p>Browser has Geolocation</p>
+}
+
+
+
+@code{
+    bool hasGeolocation;
+    protected override async Task OnAfterRenderAsync(bool firstRender){
+        if(firstRender){
+            var geo = new Geolocation(js);
+            hasGeolocation = await geo.HasGeolocationFeature();
+            StateHasChanged();
+        }
+    }
+}

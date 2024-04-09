@@ -1,0 +1,117 @@
+﻿@page "/department/create"
+<PageTitle>Create Department</PageTitle>
+<h2>Create Department</h2>
+<EditForm Model="department" OnValidSubmit="CreateorEdit">
+    <DataAnnotationsValidator />
+    <input type="hidden" @bind="department.Id" />
+    <div class="mb-2">
+        <label for="departmentName">Department Name</label>
+        <div>
+            <InputText @bind-Value="department.DepartmentName" class="form-control" />
+            <ValidationMessage For="@(()=> department.DepartmentName)" />
+        </div>
+    </div>
+    <div class="mb-2">
+        <label for="description">Description</label>
+        <div>
+            <InputTextArea @bind-Value="department.Description" class="form-control" >
+
+            </InputTextArea>
+            <ValidationMessage For="@(()=> department.Description)" />
+        </div>
+    </div>
+    <button class="btn btn-success" type="submit">Save</button>
+</EditForm>
+@if (departments.Any())
+{
+    <table class="table table-sm table-hover">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>DepartmentName</th>
+                <th>Description</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in departments)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.DepartmentName</td>
+                    <td>@item.Description</td>
+                    <td>@item.Created</td>
+                    <td>@item.Updated</td>
+                    <td>
+                        <button @onclick="@(() => EditDepartment(item.Id))" class="btn btn-info">Edit</button>
+                        <button @onclick="@(() => DeleteDepartment(item.Id))" class="btn btn-danger">Delete</button>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+}
+@code {
+    int depId = 0;
+    private Department department = new();
+    private IEnumerable<Department> departments = [];
+    [Inject]
+    private HttpClient http { get; set; } = default!;
+   
+    async Task CreateorEdit()
+    {
+        // Console.WriteLine(department.DepartmentName + " " + department.Description);
+        if (depId <= 0)
+        {
+            var resp = await http!.PostAsJsonAsync("https://localhost:7290/api/Department", department);
+            if (resp.IsSuccessStatusCode)
+            {
+                department = new();
+                Console.WriteLine("Success");
+            }
+        }
+        else
+        {
+            department.Updated = DateTime.Now;
+            var resp = await http!.PutAsJsonAsync($"https://localhost:7290/api/Department/{depId}", department);
+            if (resp.IsSuccessStatusCode)
+            {
+                department = new();
+                Console.WriteLine("Success");
+            }
+        }
+        department = new();
+        await GetDepartment();
+    }
+
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await GetDepartment();
+        await base.OnInitializedAsync();
+    }
+
+    async Task EditDepartment(int id)
+    {
+        department = await http!.GetFromJsonAsync<Department>($"https://localhost:7290/api/Department/{id}");
+        if(department != null)
+        {
+            depId = department.Id;
+        }
+    }
+    async Task DeleteDepartment(int id)
+    {
+        var res = await http!.DeleteAsync($"https://localhost:7290/api/Department/{id}");
+        if (res.IsSuccessStatusCode)
+        {
+            await GetDepartment();
+        }
+    }
+    async Task GetDepartment()
+    {
+        departments = await http!.GetFromJsonAsync<IEnumerable<Department>>("https://localhost:7290/api/Department");
+    }
+}

@@ -1,0 +1,46 @@
+﻿@page "/"
+@using BlazorAppDemo.Models
+@using RazorClassLibrary1
+@inject IJSRuntime js;
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+<DataAnnotationsValidator />
+<ValidationSummary />
+<input type="text" @bind="@name" disabled="@hide" />
+<input type="checkbox" @bind="@hide" />
+@* <input type="text" @bind="@todo.Name"  @bind:after="SearchText" @bind:event="oninput"/> *@
+<p>@name</p>
+<button type="submit" >Add To Do</button>
+
+
+<Component1></Component1>
+
+@code{
+    public string name { get; set; }
+    public bool hide { get; set; } = false;
+    [Parameter]
+    public Todo todo { get; set; }
+    private List<Todo> todos = new List<Todo>
+    {
+        new Todo{Id=1,Name="Buy",Status=true },
+        new Todo{Id=1,Name="Sell",Status=true },
+        new Todo{Id=1,Name="purchase",Status=true },
+    };
+
+    void SearchText()
+    {
+        todos = todos.Where(x => x.Name.ToLower().Contains(todo.Name.ToLower())).ToList();
+        Console.WriteLine(todo.Name);
+        StateHasChanged();
+    }
+    void AddToDo(){
+        todos.Add(todo);
+    }
+
+
+    
+}
